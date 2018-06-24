@@ -1,0 +1,68 @@
+---
+title: <center> <h1>Board Game</h1> </center>
+author: <center>"Jui-Ying Hsieh, Li-Hsin Chen"</center>
+output: github_document
+---
+##1. Background
+##2. Problem Statement
+##3. Method
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(ggplot2)
+library(Rtsne)
+library(wordcloud2)
+#=========================================================================
+# Read Data
+#=========================================================================
+boardgame <- read_csv("C:\\Users\\nishi\\OneDrive\\Kaggle\\BoardGame\\bgg_db_2018_01.csv")
+```
+
+#### 3.1 Expand Mechanic and Category Variables
+
+Variables <span style="color:red">Mechanic</span> and <span style="color:red">Category</span>
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+All_mechanic = unlist(strsplit(boardgame$mechanic, ", "))
+Uniq_mechanic = unique(All_mechanic)
+All_cat = unlist(strsplit(boardgame$category, ", "))
+Uniq_cat = unique(All_cat)
+
+boardgame_cluster <- matrix(0,nrow = dim(boardgame)[1],ncol = length(Uniq_mechanic)+length(Uniq_cat))
+
+for(i in 1:length(Uniq_mechanic)){
+  boardgame_cluster[,i] <- grepl(Uniq_mechanic[i],boardgame$mechanic)*1
+}
+for(i in 1:length(Uniq_cat)){
+  boardgame_cluster[,length(Uniq_mechanic)+i] <- grepl(Uniq_cat[i],boardgame$category)*1
+}
+boardgame_cluster <- as.data.frame(boardgame_cluster)
+colnames(boardgame_cluster)[1:length(Uniq_mechanic)] <- Uniq_mechanic
+colnames(boardgame_cluster)[(1+length(Uniq_mechanic)):136] <- Uniq_cat
+colnames(boardgame_cluster)[50] <- "none_mechanic"
+colnames(boardgame_cluster)[114] <- "none_cat"
+colnames(boardgame_cluster)[26] <- "Memory_mechanic"
+colnames(boardgame_cluster)[117] <- "Memory_cat"
+```
+
+```{r}
+colnames(boardgame_cluster)[1:20]
+head(boardgame_cluster[,1:5])
+```
+
+##4. Result
+
+##5. Future Work
+
+
+
+
+
+
+
+
+
+
+
+
+
+
