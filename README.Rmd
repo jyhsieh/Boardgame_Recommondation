@@ -1,8 +1,7 @@
 ---
 title: "Board Game"
 author: "Jui-Ying Hsieh, Li-Hsin Chen"
-output: 
-  html_document
+output: rmarkdown::github_document
 ---
 ##1. Background
 
@@ -21,7 +20,7 @@ boardgame <- read_csv("C:\\Users\\nishi\\OneDrive\\Kaggle\\BoardGame\\bgg_db_201
 
 #### 3.1 Expand Mechanic and Category Variables
 
-Variables <span style="color:red">Mechanic</span> and <span style="color:red">Category</span>
+Variables Mechanic and Category
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 All_mechanic = unlist(strsplit(boardgame$mechanic, ", "))
@@ -102,12 +101,6 @@ for(i in 1:n_cluster){
 
 i = 5
 d <- data.frame(word=names(sort(word_freq[,i],decreasing = T)),freq = sort(word_freq[,i],decreasing = T))[1:10,]
-head(d)
-if(d$freq[1]>3*d$freq[2]){
-  size <- 0.1
-} else {size <- 0.3}
-set.seed(1234)
-wordcloud2(d, size = size)
 ```
 
 ```{r}
