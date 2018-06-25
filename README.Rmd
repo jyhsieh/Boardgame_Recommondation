@@ -4,7 +4,9 @@ author: "Jui-Ying Hsieh, Li-Hsin Chen"
 output: github_document
 ---
 ##1. Background
+
 ##2. Problem Statement
+
 ##3. Method
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 library(tidyverse)
