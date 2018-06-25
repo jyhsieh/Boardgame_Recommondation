@@ -1,12 +1,6 @@
-<center>
-<h1>
 Board Game
-</h1>
-</center>
 ================
-<center>
-"Jui-Ying Hsieh, Li-Hsin Chen"
-</center>
+Jui-Ying Hsieh, Li-Hsin Chen
 
 1. Background
 -------------

@@ -1,6 +1,6 @@
 ---
-title: <center> <h1>Board Game</h1> </center>
-author: <center>"Jui-Ying Hsieh, Li-Hsin Chen"</center>
+title: "Board Game"
+author: "Jui-Ying Hsieh, Li-Hsin Chen"
 output: github_document
 ---
 ##1. Background
