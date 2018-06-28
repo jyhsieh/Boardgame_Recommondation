@@ -3,7 +3,7 @@ title: "Board Game"
 author: "Jui-Ying Hsieh, Li-Hsin Chen"
 output: rmarkdown::github_document
 ---
-##1. Background
+#1. Background
 
 We enjoying playing baord games. 
 We have collected more than 20 types of board games, and the number is still growing.

@@ -3,7 +3,7 @@ Board Game
 Jui-Ying Hsieh, Li-Hsin Chen
 
 1. Background
--------------
+=============
 
 We enjoying playing baord games. We have collected more than 20 types of board games, and the number is still growing. We like to explore games, but play one new games after another blindly is not smart. There are evidence shown that more and more games are being created; 1600 games released in the last five years, while only 1086 games released in the 19th century. To explore games efficiently, we frequently visit the famous board game website BoardGameGeek (BGG). There is a comprehensive list of games including their rankings. Our approach to explore games is to review their rankings. We did actually find enjoyable games such as Agricola, Peurto Rico and Pandemic.
 
@@ -109,16 +109,16 @@ boardgame_cluster_all %>% group_by(cluster) %>% summarise(n=n())
     ## # A tibble: 10 x 2
     ##    cluster     n
     ##      <dbl> <int>
-    ##  1       1   630
-    ##  2       2  1100
-    ##  3       3   353
-    ##  4       4   576
-    ##  5       5   291
-    ##  6       6   615
-    ##  7       7   211
-    ##  8       8   431
-    ##  9       9   310
-    ## 10      10   482
+    ##  1       1   948
+    ##  2       2   914
+    ##  3       3   531
+    ##  4       4   523
+    ##  5       5   391
+    ##  6       6   262
+    ##  7       7   644
+    ##  8       8   346
+    ##  9       9   251
+    ## 10      10   189
 
 ``` r
 #=========================================================================
