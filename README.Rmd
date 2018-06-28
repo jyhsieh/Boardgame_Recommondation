@@ -5,7 +5,24 @@ output: rmarkdown::github_document
 ---
 ##1. Background
 
-##2. Problem Statement
+We enjoying playing baord games. 
+We have collected more than 20 types of board games, and the number is still growing.
+We like to explore games, but play one new games after another blindly is not smart.
+There are evidence shown that more and more games are being created; 1600 games released in the last five years, while only 1086 games released in the 19th century. 
+To explore games efficiently, we frequently visit the famous board game website BoardGameGeek (BGG). 
+There is a comprehensive list of games including their rankings.
+Our approach to explore games is to review their rankings.
+We did actually find enjoyable games such as Agricola, Peurto Rico and Pandemic. 
+
+However, as we collect more and more games, we find out that rankings does not making us to find enjoyable games. 
+It is obvious that most of the top ranking games strategy games.
+Other type of games typically are not able to go to top ranking because BGG's users prefer "heavier" games.
+For example, one of our favorite board games "cat in the sack" is ranked 1111 in BGG, which we think the game is way underestimate.
+
+Hence, we grabbed the data from BGG, and tried to build a board game reference system that help players find their favorite games. 
+This project is about designing a board game reference system, Board Game Match, that find the most enjoyable games for users.
+We hope Board Game Match can save players time and effort for exploring new games.
+
 
 ##3. Method
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
@@ -121,6 +138,9 @@ ggplot(data = d,aes(x = reorder(word,-freq),y = freq)) +
 ##4. Result
 
 ##5. Future Work
+
+** Combine current data with customer's data **
+make better prediction
 
 
 
