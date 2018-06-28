@@ -5,8 +5,11 @@ Jui-Ying Hsieh, Li-Hsin Chen
 1. Background
 -------------
 
-2. Problem Statement
---------------------
+We enjoying playing baord games. We have collected more than 20 types of board games, and the number is still growing. We like to explore games, but play one new games after another blindly is not smart. There are evidence shown that more and more games are being created; 1600 games released in the last five years, while only 1086 games released in the 19th century. To explore games efficiently, we frequently visit the famous board game website BoardGameGeek (BGG). There is a comprehensive list of games including their rankings. Our approach to explore games is to review their rankings. We did actually find enjoyable games such as Agricola, Peurto Rico and Pandemic.
+
+However, as we collect more and more games, we find out that rankings does not making us to find enjoyable games. It is obvious that most of the top ranking games strategy games. Other type of games typically are not able to go to top ranking because BGG's users prefer "heavier" games. For example, one of our favorite board games "cat in the sack" is ranked 1111 in BGG, which we think the game is way underestimate.
+
+Hence, we grabbed the data from BGG, and tried to build a board game reference system that help players find their favorite games. This project is about designing a board game reference system, Board Game Match, that find the most enjoyable games for users. We hope Board Game Match can save players time and effort for exploring new games.
 
 3. Method
 ---------
@@ -106,16 +109,16 @@ boardgame_cluster_all %>% group_by(cluster) %>% summarise(n=n())
     ## # A tibble: 10 x 2
     ##    cluster     n
     ##      <dbl> <int>
-    ##  1       1  1020
-    ##  2       2   169
-    ##  3       3   461
-    ##  4       4   470
-    ##  5       5   858
-    ##  6       6   303
-    ##  7       7   580
-    ##  8       8   416
-    ##  9       9   162
-    ## 10      10   560
+    ##  1       1   630
+    ##  2       2  1100
+    ##  3       3   353
+    ##  4       4   576
+    ##  5       5   291
+    ##  6       6   615
+    ##  7       7   211
+    ##  8       8   431
+    ##  9       9   310
+    ## 10      10   482
 
 ``` r
 #=========================================================================
@@ -127,20 +130,11 @@ for(i in 1:n_cluster){
 }
 
 i = 5
-d <- data.frame(word=names(sort(word_freq[,i],decreasing = T)),freq = sort(word_freq[,i],decreasing = T))[1:10,]
+d <- data.frame(word=names(sort(word_freq[,i],decreasing = T)),freq = sort(word_freq[,i],decreasing = T))
 ```
 
 ``` r
-set.seed(1234)
-wordcloud(words = d$word, freq = d$freq, min.freq = 1,
-          max.words=max(d$freq), random.order=FALSE, rot.per=0.35,
-          scale = c(1.5,0.8), colors=brewer.pal(8, "Dark2"))
-```
-
-![](README_files/figure-markdown_github/unnamed-chunk-6-1.png)
-
-``` r
-ggplot(data = d,aes(x = reorder(word,-freq),y = freq)) + 
+ggplot(data = d[1:10,],aes(x = reorder(word,-freq),y = freq)) + 
   geom_bar(stat = "identity", fill = "steelblue") +
   xlab("Game Type")+ ylab("Frequency") +
   ggtitle(paste("Top 10 Game Types of Cluster ",i))+
@@ -153,10 +147,12 @@ ggplot(data = d,aes(x = reorder(word,-freq),y = freq)) +
   )
 ```
 
-![](README_files/figure-markdown_github/unnamed-chunk-7-1.png)
+![](README_files/figure-markdown_github/unnamed-chunk-6-1.png)
 
 4. Result
 ---------
 
 5. Future Work
 --------------
+
+\*\* Combine current data with customer's data \*\* make better prediction
