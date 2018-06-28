@@ -106,16 +106,16 @@ boardgame_cluster_all %>% group_by(cluster) %>% summarise(n=n())
     ## # A tibble: 10 x 2
     ##    cluster     n
     ##      <dbl> <int>
-    ##  1       1   605
-    ##  2       2  1275
-    ##  3       3   210
-    ##  4       4   358
-    ##  5       5   227
-    ##  6       6   351
-    ##  7       7   582
-    ##  8       8   537
-    ##  9       9   302
-    ## 10      10   552
+    ##  1       1  1020
+    ##  2       2   169
+    ##  3       3   461
+    ##  4       4   470
+    ##  5       5   858
+    ##  6       6   303
+    ##  7       7   580
+    ##  8       8   416
+    ##  9       9   162
+    ## 10      10   560
 
 ``` r
 #=========================================================================
@@ -131,6 +131,15 @@ d <- data.frame(word=names(sort(word_freq[,i],decreasing = T)),freq = sort(word_
 ```
 
 ``` r
+set.seed(1234)
+wordcloud(words = d$word, freq = d$freq, min.freq = 1,
+          max.words=max(d$freq), random.order=FALSE, rot.per=0.35,
+          scale = c(1.5,0.8), colors=brewer.pal(8, "Dark2"))
+```
+
+![](README_files/figure-markdown_github/unnamed-chunk-6-1.png)
+
+``` r
 ggplot(data = d,aes(x = reorder(word,-freq),y = freq)) + 
   geom_bar(stat = "identity", fill = "steelblue") +
   xlab("Game Type")+ ylab("Frequency") +
@@ -144,7 +153,7 @@ ggplot(data = d,aes(x = reorder(word,-freq),y = freq)) +
   )
 ```
 
-![](README_files/figure-markdown_github/unnamed-chunk-6-1.png)
+![](README_files/figure-markdown_github/unnamed-chunk-7-1.png)
 
 4. Result
 ---------

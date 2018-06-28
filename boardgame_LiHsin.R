@@ -131,13 +131,15 @@ for(i in 1:n_cluster){
   word_freq <- cbind(word_freq,apply(boardgame_cluster_all[boardgame_cluster_all$cluster==i,-c(1,138)],2,sum))
 }
 
-i = 9
-d <- data.frame(word=names(sort(word_freq[,i],decreasing = T)),freq = sort(word_freq[,i],decreasing = T))[1:10,]
-head(d)
+i = 7
+d <- data.frame(word=names(sort(word_freq[,i],decreasing = T)),freq = sort(word_freq[,i],decreasing = T))
 set.seed(1234)
-wordcloud2(d, size = 0.1)
+if(d$freq[1]>3*d$freq[2]){
+  size <- 0.1
+} else{size <- 0.5}
+wordcloud2(d, size = size)
 
-ggplot(data = d,aes(x = reorder(word,-freq),y = freq)) + 
+ggplot(data = d[1:10,],aes(x = reorder(word,-freq),y = freq)) + 
   geom_bar(stat = "identity", fill = "steelblue") +
   xlab("Game Type")+ ylab("Frequency") +
   ggtitle(paste("Top 10 Game Types of Cluster ",i))+

@@ -12,6 +12,7 @@ output: rmarkdown::github_document
 library(tidyverse)
 library(ggplot2)
 library(wordcloud2)
+library(wordcloud)
 #=========================================================================
 # Read Data
 #=========================================================================
@@ -100,11 +101,11 @@ for(i in 1:n_cluster){
 }
 
 i = 5
-d <- data.frame(word=names(sort(word_freq[,i],decreasing = T)),freq = sort(word_freq[,i],decreasing = T))[1:10,]
+d <- data.frame(word=names(sort(word_freq[,i],decreasing = T)),freq = sort(word_freq[,i],decreasing = T))
 ```
 
 ```{r}
-ggplot(data = d,aes(x = reorder(word,-freq),y = freq)) + 
+ggplot(data = d[1:10,],aes(x = reorder(word,-freq),y = freq)) + 
   geom_bar(stat = "identity", fill = "steelblue") +
   xlab("Game Type")+ ylab("Frequency") +
   ggtitle(paste("Top 10 Game Types of Cluster ",i))+

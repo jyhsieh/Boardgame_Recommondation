@@ -1,0 +1,13 @@
+name: Boardgame_Recommondation
+title: Boardgame_Recommondation
+username:
+account: lihsinchen
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 367513
+bundleId: 1448948
+url: https://lihsinchen.shinyapps.io/Boardgame_Recommondation/
+when: 1529982168.03624
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: boardgame_LiHsin.R|README.md|README.Rmd|README_files/figure-markdown_github/unnamed-chunk-4-1.png|README_files/figure-markdown_github/unnamed-chunk-6-1.png|README_files/figure-markdown_github/unnamed-chunk-7-1.png
