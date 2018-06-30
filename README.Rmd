@@ -3,7 +3,7 @@ title: "Board Game"
 author: "Jui-Ying Hsieh, Li-Hsin Chen"
 output: rmarkdown::github_document
 ---
-## 1. Background
+### 1. Background
 
 We enjoying playing baord games. 
 We have collected more than 20 types of board games, and the number is still growing.
@@ -24,7 +24,7 @@ This project is about designing a board game reference system, Board Game Match,
 We hope Board Game Match can save players time and effort for exploring new games.
 
 
-## 3. Method
+### 2. Method
 
 Several fantastic algorithms have been invented and widely used in building a recommendation system in the past few years. The choice of algorithms highly depepends on the data used for the system. Based on the data we have, we choose [item-based collaborative filtering](https://en.wikipedia.org/wiki/Item-item_collaborative_filtering) method. In this method, recommendation is made by the similarity of items among each others, that is, how similar they are according to their features.
 
@@ -45,7 +45,7 @@ colnames(boardgame)
 ```
 
 
-### 3.1 Expand Mechanic and Category Variables
+#### 2.1 Expand Mechanic and Category Variables
 
 Before using item-based collaborative filtering, we need to define the similarity between boardgames. We use only "mechanic" and "category" in the definition of similarity. There are 52 different mechanic types and 84 different categories. Hence, 136 (52 + 84) dummy variables are created to represent mechanic and category variables.
 
@@ -145,9 +145,9 @@ ggplot(data = d[1:10,],aes(x = reorder(word,-freq),y = freq)) +
 
 ```
 
-## 4. Result
+### 3. Result
 
-## 5. Future Work
+### 4. Future Work
 
 ** Combine current data with customer's data **
 make better prediction
