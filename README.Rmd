@@ -3,7 +3,7 @@ title: "Board Game"
 author: "Jui-Ying Hsieh, Li-Hsin Chen"
 output: rmarkdown::github_document
 ---
-#1. Background
+## 1. Background
 
 We enjoying playing baord games. 
 We have collected more than 20 types of board games, and the number is still growing.
@@ -24,7 +24,12 @@ This project is about designing a board game reference system, Board Game Match,
 We hope Board Game Match can save players time and effort for exploring new games.
 
 
-##3. Method
+## 3. Method
+
+Several fantastic algorithms have been invented and widely used in building a recommendation system in the past few years. The choice of algorithms highly depepends on the data used for the system. Based on the data we have, we choose [item-based collaborative filtering](https://en.wikipedia.org/wiki/Item-item_collaborative_filtering) method. In this method, recommendation is made by the similarity of items among each others, that is, how similar they are according to their features.
+
+Dataset is obtained from [Kaggle](https://www.kaggle.com/mrpantherson/board-game-data#bgg_db_2018_01.csv). This dataset contains many interesting features of about 5,000 boardgames. These feature includes:
+
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 library(tidyverse)
 library(ggplot2)
@@ -35,12 +40,16 @@ library(wordcloud)
 #=========================================================================
 boardgame <- read_csv("C:\\Users\\nishi\\OneDrive\\Kaggle\\BoardGame\\bgg_db_2018_01.csv")
 ```
+```{r}
+colnames(boardgame)
+```
 
-#### 3.1 Expand Mechanic and Category Variables
 
-Variables Mechanic and Category
+### 3.1 Expand Mechanic and Category Variables
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE}
+Before using item-based collaborative filtering, we need to define the similarity between boardgames. We use only "mechanic" and "category" in the definition of similarity. There are 52 different mechanic types and 84 different categories. Hence, 136 (52 + 84) dummy variables are created to represent mechanic and category variables.
+
+```{r, message=FALSE, warning=FALSE}
 All_mechanic = unlist(strsplit(boardgame$mechanic, ", "))
 Uniq_mechanic = unique(All_mechanic)
 All_cat = unlist(strsplit(boardgame$category, ", "))
@@ -136,9 +145,9 @@ ggplot(data = d[1:10,],aes(x = reorder(word,-freq),y = freq)) +
 
 ```
 
-##4. Result
+## 4. Result
 
-##5. Future Work
+## 5. Future Work
 
 ** Combine current data with customer's data **
 make better prediction

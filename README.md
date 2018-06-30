@@ -3,7 +3,7 @@ Board Game
 Jui-Ying Hsieh, Li-Hsin Chen
 
 1. Background
-=============
+-------------
 
 We enjoying playing baord games. We have collected more than 20 types of board games, and the number is still growing. We like to explore games, but play one new games after another blindly is not smart. There are evidence shown that more and more games are being created; 1600 games released in the last five years, while only 1086 games released in the 19th century. To explore games efficiently, we frequently visit the famous board game website BoardGameGeek (BGG). There is a comprehensive list of games including their rankings. Our approach to explore games is to review their rankings. We did actually find enjoyable games such as Agricola, Peurto Rico and Pandemic.
 
@@ -14,9 +14,45 @@ Hence, we grabbed the data from BGG, and tried to build a board game reference s
 3. Method
 ---------
 
-#### 3.1 Expand Mechanic and Category Variables
+Several fantastic algorithms have been invented and widely used in building a recommendation system in the past few years. The choice of algorithms highly depepends on the data used for the system. Based on the data we have, we choose [item-based collaborative filtering](https://en.wikipedia.org/wiki/Item-item_collaborative_filtering) method. In this method, recommendation is made by the similarity of items among each others, that is, how similar they are according to their features.
 
-Variables Mechanic and Category
+Dataset is obtained from [Kaggle](https://www.kaggle.com/mrpantherson/board-game-data#bgg_db_2018_01.csv). This dataset contains many interesting features of about 5,000 boardgames. These feature includes:
+
+``` r
+colnames(boardgame)
+```
+
+    ##  [1] "rank"        "bgg_url"     "game_id"     "names"       "min_players"
+    ##  [6] "max_players" "avg_time"    "min_time"    "max_time"    "year"       
+    ## [11] "avg_rating"  "geek_rating" "num_votes"   "image_url"   "age"        
+    ## [16] "mechanic"    "owned"       "category"    "designer"    "weight"
+
+### 3.1 Expand Mechanic and Category Variables
+
+Before using item-based collaborative filtering, we need to define the similarity between boardgames. We use only "mechanic" and "category" in the definition of similarity. There are 52 different mechanic types and 84 different categories. Hence, 136 (52 + 84) dummy variables are created to represent mechanic and category variables.
+
+``` r
+All_mechanic = unlist(strsplit(boardgame$mechanic, ", "))
+Uniq_mechanic = unique(All_mechanic)
+All_cat = unlist(strsplit(boardgame$category, ", "))
+Uniq_cat = unique(All_cat)
+
+boardgame_cluster <- matrix(0,nrow = dim(boardgame)[1],ncol = length(Uniq_mechanic)+length(Uniq_cat))
+
+for(i in 1:length(Uniq_mechanic)){
+  boardgame_cluster[,i] <- grepl(Uniq_mechanic[i],boardgame$mechanic)*1
+}
+for(i in 1:length(Uniq_cat)){
+  boardgame_cluster[,length(Uniq_mechanic)+i] <- grepl(Uniq_cat[i],boardgame$category)*1
+}
+boardgame_cluster <- as.data.frame(boardgame_cluster)
+colnames(boardgame_cluster)[1:length(Uniq_mechanic)] <- Uniq_mechanic
+colnames(boardgame_cluster)[(1+length(Uniq_mechanic)):136] <- Uniq_cat
+colnames(boardgame_cluster)[50] <- "none_mechanic"
+colnames(boardgame_cluster)[114] <- "none_cat"
+colnames(boardgame_cluster)[26] <- "Memory_mechanic"
+colnames(boardgame_cluster)[117] <- "Memory_cat"
+```
 
 ``` r
 colnames(boardgame_cluster)[1:20]
@@ -99,7 +135,7 @@ plot(bgg_pca,axes = c(1,2),habillage = "ind",col.hab = cluster_result,label = "n
 legend(10,10,1:n_cluster,col = 1:n_cluster,pch = 1,pt.lwd = 4)
 ```
 
-![](README_files/figure-markdown_github/unnamed-chunk-4-1.png)
+![](README_files/figure-markdown_github/unnamed-chunk-5-1.png)
 
 ``` r
 boardgame_cluster_all <- cbind(names = boardgame$names,boardgame_cluster,cluster = cluster_result)
@@ -109,16 +145,16 @@ boardgame_cluster_all %>% group_by(cluster) %>% summarise(n=n())
     ## # A tibble: 10 x 2
     ##    cluster     n
     ##      <dbl> <int>
-    ##  1       1   948
-    ##  2       2   914
-    ##  3       3   531
-    ##  4       4   523
-    ##  5       5   391
-    ##  6       6   262
-    ##  7       7   644
-    ##  8       8   346
-    ##  9       9   251
-    ## 10      10   189
+    ##  1       1   346
+    ##  2       2   921
+    ##  3       3   425
+    ##  4       4   799
+    ##  5       5   310
+    ##  6       6   343
+    ##  7       7   269
+    ##  8       8   328
+    ##  9       9   672
+    ## 10      10   586
 
 ``` r
 #=========================================================================
@@ -147,7 +183,7 @@ ggplot(data = d[1:10,],aes(x = reorder(word,-freq),y = freq)) +
   )
 ```
 
-![](README_files/figure-markdown_github/unnamed-chunk-6-1.png)
+![](README_files/figure-markdown_github/unnamed-chunk-7-1.png)
 
 4. Result
 ---------
