@@ -12,9 +12,17 @@ Hence, we grabbed the data from BGG, and tried to build a board game reference s
 
 ### 2. Method
 
-Several fantastic algorithms have been invented and widely used in building a recommendation system in the past few years. The choice of algorithms highly depepends on the data used for the system. Based on the data we have, we choose [item-based collaborative filtering](https://en.wikipedia.org/wiki/Item-item_collaborative_filtering) method. In this method, recommendation is made by the similarity of items among each others, that is, how similar they are according to their features.
+Several fantastic algorithms have been invented and widely used in building a recommendation system in the past few years. The choice of algorithms highly depends on the data used for the system. Since the data we have contains only information of boardgame, we choose [item-based collaborative filtering](https://en.wikipedia.org/wiki/Item-item_collaborative_filtering) method. In this method, recommendation is made by the similarity of items among each others, that is, how similar they are according to their features.
 
 Dataset is obtained from [Kaggle](https://www.kaggle.com/mrpantherson/board-game-data#bgg_db_2018_01.csv). This dataset contains many interesting features of about 5,000 boardgames. These feature includes:
+
+``` r
+library(tidyverse)
+library(ggplot2)
+library(wordcloud2)
+library(wordcloud)
+boardgame <- read_csv("~/bgg_db_2018_01.csv")
+```
 
 ``` r
 colnames(boardgame)
@@ -25,9 +33,11 @@ colnames(boardgame)
     ## [11] "avg_rating"  "geek_rating" "num_votes"   "image_url"   "age"        
     ## [16] "mechanic"    "owned"       "category"    "designer"    "weight"
 
+In this section, we will go through the process of building a recommendation system for boardgames. Data preprocessing will be conducted in sector 2.1. To reduce the calculation of pair-wise similarities, clustering will be applied on the processed data in sector 2.2. Similarity between boardgames defined in sector 2.3 will be calculated only within the same cluster. Finally, we can make recommendations for boardgames in sector 2.4 based on the similarity we defined.
+
 #### 2.1 Expand Mechanic and Category Variables
 
-Before using item-based collaborative filtering, we need to define the similarity between boardgames. We use only "mechanic" and "category" in the definition of similarity. There are 52 different mechanic types and 84 different categories. Hence, 136 (52 + 84) dummy variables are created to represent mechanic and category variables.
+Instead of considering all features of boardgames, we use only "mechanic" and "category" in our system. There are 52 different mechanic types and 84 different categories. Hence, 136 (52 + 84) dummy variables are created to represent mechanic and category variables.
 
 ``` r
 All_mechanic = unlist(strsplit(boardgame$mechanic, ", "))
@@ -67,30 +77,15 @@ colnames(boardgame_cluster)[1:20]
     ## [17] "Campaign / Battle Card Driven" "Dice Rolling"                 
     ## [19] "Tile Placement"                "Area Movement"
 
-``` r
-head(boardgame_cluster[,1:5])
-```
+#### 2.2 Clustering
 
-    ##   Action / Movement Programming Co-operative Play Grid Movement
-    ## 1                             1                 1             1
-    ## 2                             0                 1             0
-    ## 3                             0                 0             0
-    ## 4                             0                 0             0
-    ## 5                             0                 0             0
-    ## 6                             0                 0             0
-    ##   Hand Management Modular Board
-    ## 1               1             1
-    ## 2               1             0
-    ## 3               0             0
-    ## 4               1             0
-    ## 5               1             0
-    ## 6               1             0
+Since there are about 5,000 boardgames in the dataset, it will be computationally expensive to calculate simliarities for all possible pair-wise combinations. Hence, we cluster the boardgames and then calculate the similarity among each cluster.
 
 ``` r
 #=========================================================================
 # Clustering (K-means) determined by max mode
 #=========================================================================
-n_cluster <- 10
+n_cluster <- 5
 getmode <- function(v) {
   uniqv <- unique(v)
   uniqv[which.max(tabulate(match(v, uniqv)))]
@@ -106,8 +101,9 @@ cluster_max <- function(dat,n_cluster,num_iter){
 #========================================================
 #========================================================
 cluster_result <- cluster_max(boardgame_cluster,n_cluster = n_cluster,num_iter = 100)
+```
 
-
+``` r
 #========================================================
 # Visualize clusters
 #========================================================
@@ -133,26 +129,21 @@ plot(bgg_pca,axes = c(1,2),habillage = "ind",col.hab = cluster_result,label = "n
 legend(10,10,1:n_cluster,col = 1:n_cluster,pch = 1,pt.lwd = 4)
 ```
 
-![](README_files/figure-markdown_github/unnamed-chunk-5-1.png)
+![](README_files/figure-markdown_github/unnamed-chunk-6-1.png)
 
 ``` r
 boardgame_cluster_all <- cbind(names = boardgame$names,boardgame_cluster,cluster = cluster_result)
 boardgame_cluster_all %>% group_by(cluster) %>% summarise(n=n())
 ```
 
-    ## # A tibble: 10 x 2
-    ##    cluster     n
-    ##      <dbl> <int>
-    ##  1       1   944
-    ##  2       2  1066
-    ##  3       3   831
-    ##  4       4   502
-    ##  5       5   498
-    ##  6       6   278
-    ##  7       7   120
-    ##  8       8   240
-    ##  9       9   347
-    ## 10      10   173
+    ## # A tibble: 5 x 2
+    ##   cluster     n
+    ##     <dbl> <int>
+    ## 1       1  1242
+    ## 2       2   541
+    ## 3       3  1131
+    ## 4       4  1401
+    ## 5       5   684
 
 ``` r
 #=========================================================================
@@ -162,10 +153,25 @@ word_freq <- c()
 for(i in 1:n_cluster){
   word_freq <- cbind(word_freq,apply(boardgame_cluster_all[boardgame_cluster_all$cluster==i,-c(1,138)],2,sum))
 }
+```
 
+``` r
 i = 5
 d <- data.frame(word=names(sort(word_freq[,i],decreasing = T)),freq = sort(word_freq[,i],decreasing = T))
+color = c(2,2,2,rep(1,length(d$word)-3))
+
+size = 4
+t = 0
+while(is.null(t)!=T){
+  t <- tryCatch(expr = {wordcloud(words = d$word,freq = d$freq,max.words = 100, scale = c(size,0.2),random.order = F,ordered.colors = T,colors = color,rot.per = 0.1)}, 
+                warning = function(w) w
+  )
+  title(main = "Word Cloud",sub = paste("Clster",i))
+  size = size*.8
+}
 ```
+
+![](README_files/figure-markdown_github/unnamed-chunk-8-1.png)
 
 ``` r
 ggplot(data = d[1:10,],aes(x = reorder(word,-freq),y = freq)) + 
@@ -181,7 +187,11 @@ ggplot(data = d[1:10,],aes(x = reorder(word,-freq),y = freq)) +
   )
 ```
 
-![](README_files/figure-markdown_github/unnamed-chunk-7-1.png)
+![](README_files/figure-markdown_github/unnamed-chunk-9-1.png)
+
+#### 2.3 Similarity
+
+#### 2.4 Recommendation System
 
 ### 3. Result
 

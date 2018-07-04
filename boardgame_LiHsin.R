@@ -67,7 +67,7 @@ colnames(boardgame_cluster)[1:20]
 #=========================================================================
 # Clustering (K-means)
 #=========================================================================
-n_cluster <- 10
+n_cluster <- 3
 
 set.seed(123)
 kmean_result <- kmeans(boardgame_cluster,centers = n_cluster)
@@ -131,13 +131,24 @@ for(i in 1:n_cluster){
   word_freq <- cbind(word_freq,apply(boardgame_cluster_all[boardgame_cluster_all$cluster==i,-c(1,138)],2,sum))
 }
 
-i = 7
+i = 1
 d <- data.frame(word=names(sort(word_freq[,i],decreasing = T)),freq = sort(word_freq[,i],decreasing = T))
 set.seed(1234)
 if(d$freq[1]>3*d$freq[2]){
   size <- 0.1
 } else{size <- 0.5}
-wordcloud2(d, size = size)
+wordcloud2(d, size = 0.8, fontWeight = "bold", color = "random-light",backgroundColor = "grey")
+letterCloud(as.data.frame(d),word = "R",wordSize = 2)
+
+
+size = 8
+t = 0
+while(is.null(t)!=T){
+  t <- tryCatch(expr = {wordcloud(words = d$word,freq = d$freq,max.words = 100, scale = c(size,0.2),random.order = F,ordered.colors = T,colors = color,rot.per = 0.1)}, 
+                warning = function(w) w
+  )
+  size = size/2
+}
 
 ggplot(data = d[1:10,],aes(x = reorder(word,-freq),y = freq)) + 
   geom_bar(stat = "identity", fill = "steelblue") +
@@ -151,8 +162,14 @@ ggplot(data = d[1:10,],aes(x = reorder(word,-freq),y = freq)) +
     axis.title.y = element_text(size=14, face="bold")
   )
 
+ypos <- par()$usr[3] - 0.1*(par()$usr[4] - par()$usr[3])
+b <- barplot(d[1:10,]$freq,axisnames = T)
+axis(1,at = b,labels = F)
+text(x = b, y = ypos,labels = d[1:10,]$word, srt = 45, xpd = T, adj = 1)
 
-  
+
+
+
 #=========================================================================
 # Similarity
 #=========================================================================
@@ -190,3 +207,27 @@ for(i in 1:length(years)){
 
 plot(x = years[60:104], y = type_year[3,60:104],type = "l")
 rownames(type_year)
+
+
+
+
+#
+# related function ----
+related = function(x){
+  no_cluster = bg_clust[which(bg_clust$names == x), "cluster"]
+  return(bg_clust[which(bg_clust$cluster == no_cluster),"names"])
+}
+related("Agricola")
+
+# distance function ----
+similar = function(x,n){
+  temp = bg_clust[which(bg_clust$names == x),]
+  dist = apply(bg_clust[which(bg_clust$cluster == temp$cluster),2:137], 1, 
+               function(xx) sum((temp[2:137] - xx)^2))
+  return(bg_clust[head(names(sort(dist)[-1]),n),1])
+}
+similar("Agricola",10)
+
+
+
+

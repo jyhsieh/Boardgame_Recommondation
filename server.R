@@ -69,13 +69,6 @@ server <- function(input,output){
     #=========================================================================
     data.frame(word=names(sort(word_freq[,i()],decreasing = T)),freq = sort(word_freq[,i()],decreasing = T))
   })
-  output$wordcloud <- renderWordcloud2({
-    set.seed(1234)
-    if(d()$freq[1]>3*d()$freq[2]){
-      size <- 0.1
-    } else{size <- 0.5}
-    wordcloud2(d(), size = size)
-  })
   
   output$freqplot <- renderPlot({
     ggplot(data = d()[1:10,],aes(x = reorder(word,-freq),y = freq)) + 
@@ -91,6 +84,13 @@ server <- function(input,output){
       )
   })
   
+  output$wordcloud <- renderWordcloud2({
+    set.seed(1234)
+    if(d()$freq[1]>3*d()$freq[2]){
+      size <- 0.1
+    } else{size <- 0.3}
+    wordcloud2(d(), size = size, fontWeight = "bold", color = "random-light",backgroundColor = "grey")
+  })
   
   
   
