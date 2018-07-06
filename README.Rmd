@@ -28,7 +28,7 @@ We hope Board Game Match can save players time and effort for exploring new game
 
 Several fantastic algorithms have been invented and widely used in building a recommendation system in the past few years. The choice of algorithms highly depends on the data used for the system. Since the data we have contains only information of boardgame, we choose [item-based collaborative filtering](https://en.wikipedia.org/wiki/Item-item_collaborative_filtering) method. In this method, recommendation is made by the similarity of items among each others, that is, how similar they are according to their features.
 
-Dataset is obtained from [Kaggle](https://www.kaggle.com/mrpantherson/board-game-data#bgg_db_2018_01.csv). This dataset contains many interesting features of about 5,000 boardgames. These feature includes:
+This project is done in R with the following packages:
 
 ```{r, message=FALSE, warning=FALSE}
 library(tidyverse)
@@ -37,6 +37,9 @@ library(wordcloud2)
 library(wordcloud)
 boardgame <- read_csv("~/bgg_db_2018_01.csv")
 ```
+
+Dataset is obtained from [Kaggle](https://www.kaggle.com/mrpantherson/board-game-data#bgg_db_2018_01.csv). This dataset contains many interesting features of about 5,000 boardgames. These feature includes:
+
 ```{r}
 colnames(boardgame)
 ```
@@ -75,12 +78,14 @@ colnames(boardgame_cluster)[1:20]
 ```
 
 #### 2.2 Clustering
-Since there are about 5,000 boardgames in the dataset, it will be computationally expensive to calculate simliarities for all possible pair-wise combinations. Hence, we cluster the boardgames and then calculate the similarity among each cluster.
+Since there are about 5,000 boardgames in the dataset, it will be computationally expensive to calculate simliarities for all possible pair-wise combinations. Hence, we cluster the boardgames into few groups, and the similarities will be calculated within the groups.
+
+[K-means](https://en.wikipedia.org/wiki/K-means_clustering) is one of the most popular and intuitive clustering method. This method aims at finding k clusters such that the within-cluster sum of squares is minimized. The result of k-means is affected by the initialization of k points. Hence, k-means is performed several times (default 100 times) and the cluster with max count is assigned to each boardgames. Here, we use $k = 5$ as an example:
 
 ```{r}
-#=========================================================================
+#=========================================================
 # Clustering (K-means) determined by max mode
-#=========================================================================
+#=========================================================
 n_cluster <- 5
 getmode <- function(v) {
   uniqv <- unique(v)
@@ -99,8 +104,9 @@ cluster_max <- function(dat,n_cluster,num_iter){
 cluster_result <- cluster_max(boardgame_cluster,n_cluster = n_cluster,num_iter = 100)
 ```
 
+Principal component analysis (PCA) is performed to visualize the result of clustering.
 
-```{r}
+```{r, message=FALSE}
 #========================================================
 # Visualize clusters
 #========================================================
@@ -108,27 +114,32 @@ cluster_result <- cluster_max(boardgame_cluster,n_cluster = n_cluster,num_iter =
 library(MASS)
 library(FactoMineR)
 bgg_pca <- PCA(scale(boardgame_cluster),ncp = 6,graph = FALSE)
-#plot(bgg_pca,choix = "var")
-#plot(bgg_pca$ind$coord)
-#legend(20,20,1:n_cluster,col = 1:n_cluster,pch = 1,pt.lwd = 4)
 
 plot(bgg_pca,axes = c(1,2),habillage = "ind",col.hab = cluster_result,label = "none")
 legend(10,10,1:n_cluster,col = 1:n_cluster,pch = 1,pt.lwd = 4)
-
 ```
 
 
 ```{r}
 boardgame_cluster_all <- cbind(names = boardgame$names,boardgame_cluster,cluster = cluster_result)
 boardgame_cluster_all %>% group_by(cluster) %>% summarise(n=n())
-#=========================================================================
+```
+
+#### 2.3 Similarity
+
+#### 2.4 Recommendation System
+
+
+
+### 3. Result
+```{r}
+#=========================================================
 # Word Cloud and Frequency Plot
-#=========================================================================
+#=========================================================
 word_freq <- c()
 for(i in 1:n_cluster){
   word_freq <- cbind(word_freq,apply(boardgame_cluster_all[boardgame_cluster_all$cluster==i,-c(1,138)],2,sum))
 }
-
 ```
 
 ```{r}
@@ -160,14 +171,6 @@ ggplot(data = d[1:10,],aes(x = reorder(word,-freq),y = freq)) +
   )
 
 ```
-
-#### 2.3 Similarity
-
-#### 2.4 Recommendation System
-
-
-
-### 3. Result
 
 ### 4. Future Work
 

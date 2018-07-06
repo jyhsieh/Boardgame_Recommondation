@@ -14,7 +14,7 @@ Hence, we grabbed the data from BGG, and tried to build a board game reference s
 
 Several fantastic algorithms have been invented and widely used in building a recommendation system in the past few years. The choice of algorithms highly depends on the data used for the system. Since the data we have contains only information of boardgame, we choose [item-based collaborative filtering](https://en.wikipedia.org/wiki/Item-item_collaborative_filtering) method. In this method, recommendation is made by the similarity of items among each others, that is, how similar they are according to their features.
 
-Dataset is obtained from [Kaggle](https://www.kaggle.com/mrpantherson/board-game-data#bgg_db_2018_01.csv). This dataset contains many interesting features of about 5,000 boardgames. These feature includes:
+This project is done in R with the following packages:
 
 ``` r
 library(tidyverse)
@@ -23,6 +23,8 @@ library(wordcloud2)
 library(wordcloud)
 boardgame <- read_csv("~/bgg_db_2018_01.csv")
 ```
+
+Dataset is obtained from [Kaggle](https://www.kaggle.com/mrpantherson/board-game-data#bgg_db_2018_01.csv). This dataset contains many interesting features of about 5,000 boardgames. These feature includes:
 
 ``` r
 colnames(boardgame)
@@ -79,12 +81,14 @@ colnames(boardgame_cluster)[1:20]
 
 #### 2.2 Clustering
 
-Since there are about 5,000 boardgames in the dataset, it will be computationally expensive to calculate simliarities for all possible pair-wise combinations. Hence, we cluster the boardgames and then calculate the similarity among each cluster.
+Since there are about 5,000 boardgames in the dataset, it will be computationally expensive to calculate simliarities for all possible pair-wise combinations. Hence, we cluster the boardgames into few groups, and the similarities will be calculated within the groups.
+
+[K-means](https://en.wikipedia.org/wiki/K-means_clustering) is one of the most popular and intuitive clustering method. This method aims at finding k clusters such that the within-cluster sum of squares is minimized. The result of k-means is affected by the initialization of k points. Hence, k-means is performed several times (default 100 times) and the cluster with max count is assigned to each boardgames. Here, we use *k* = 5 as an example:
 
 ``` r
-#=========================================================================
+#=========================================================
 # Clustering (K-means) determined by max mode
-#=========================================================================
+#=========================================================
 n_cluster <- 5
 getmode <- function(v) {
   uniqv <- unique(v)
@@ -103,27 +107,16 @@ cluster_max <- function(dat,n_cluster,num_iter){
 cluster_result <- cluster_max(boardgame_cluster,n_cluster = n_cluster,num_iter = 100)
 ```
 
+Principal component analysis (PCA) is performed to visualize the result of clustering.
+
 ``` r
 #========================================================
 # Visualize clusters
 #========================================================
 # Visualize through PCA
 library(MASS)
-```
-
-    ## 
-    ## Attaching package: 'MASS'
-
-    ## The following object is masked from 'package:dplyr':
-    ## 
-    ##     select
-
-``` r
 library(FactoMineR)
 bgg_pca <- PCA(scale(boardgame_cluster),ncp = 6,graph = FALSE)
-#plot(bgg_pca,choix = "var")
-#plot(bgg_pca$ind$coord)
-#legend(20,20,1:n_cluster,col = 1:n_cluster,pch = 1,pt.lwd = 4)
 
 plot(bgg_pca,axes = c(1,2),habillage = "ind",col.hab = cluster_result,label = "none")
 legend(10,10,1:n_cluster,col = 1:n_cluster,pch = 1,pt.lwd = 4)
@@ -139,16 +132,22 @@ boardgame_cluster_all %>% group_by(cluster) %>% summarise(n=n())
     ## # A tibble: 5 x 2
     ##   cluster     n
     ##     <dbl> <int>
-    ## 1       1  1242
-    ## 2       2   541
-    ## 3       3  1131
-    ## 4       4  1401
-    ## 5       5   684
+    ## 1       1  3220
+    ## 2       2   395
+    ## 3       3   285
+    ## 4       4   348
+    ## 5       5   751
+
+#### 2.3 Similarity
+
+#### 2.4 Recommendation System
+
+### 3. Result
 
 ``` r
-#=========================================================================
+#=========================================================
 # Word Cloud and Frequency Plot
-#=========================================================================
+#=========================================================
 word_freq <- c()
 for(i in 1:n_cluster){
   word_freq <- cbind(word_freq,apply(boardgame_cluster_all[boardgame_cluster_all$cluster==i,-c(1,138)],2,sum))
@@ -166,12 +165,11 @@ while(is.null(t)!=T){
   t <- tryCatch(expr = {wordcloud(words = d$word,freq = d$freq,max.words = 100, scale = c(size,0.2),random.order = F,ordered.colors = T,colors = color,rot.per = 0.1)}, 
                 warning = function(w) w
   )
-  title(main = "Word Cloud",sub = paste("Clster",i))
   size = size*.8
 }
 ```
 
-![](README_files/figure-markdown_github/unnamed-chunk-8-1.png)
+![](README_files/figure-markdown_github/unnamed-chunk-9-1.png)![](README_files/figure-markdown_github/unnamed-chunk-9-2.png)![](README_files/figure-markdown_github/unnamed-chunk-9-3.png)
 
 ``` r
 ggplot(data = d[1:10,],aes(x = reorder(word,-freq),y = freq)) + 
@@ -187,13 +185,7 @@ ggplot(data = d[1:10,],aes(x = reorder(word,-freq),y = freq)) +
   )
 ```
 
-![](README_files/figure-markdown_github/unnamed-chunk-9-1.png)
-
-#### 2.3 Similarity
-
-#### 2.4 Recommendation System
-
-### 3. Result
+![](README_files/figure-markdown_github/unnamed-chunk-10-1.png)
 
 ### 4. Future Work
 
