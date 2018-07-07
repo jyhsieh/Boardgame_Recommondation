@@ -13,13 +13,15 @@ dim(boardgame)
 #=========================================================================
 # EDA
 #=========================================================================
+
+# boardgame = boardgame[!duplicated(boardgame$names),]
+# boardgame <- na.omit(boardgame)
 sort(boardgame$year)
-boardgame[1083,] %>% View()
-a = boardgame %>% filter(year>1980) %>% group_by(year) %>% summarise(n=n(), own=sum(owned))
-boardgame %>% filter(year>1980) %>% group_by(year) %>% summarise(n=n()) %>% ggplot(aes(year,n)) + geom_area()
-boardgame %>% filter(year>1980) %>% group_by(year) %>% summarise(own=sum(owned)) %>% ggplot(aes(year,own)) + geom_area()
-plot(a$year,a$own,type = "l")
-boardgame
+boardgame[which(boardgame$year==-3000),] %>% View()
+temp = boardgame %>% filter(year>1980) %>% group_by(year) %>% summarise(n=n(), own=sum(owned))
+boardgame %>% filter(year>1980) %>% group_by(year) %>% summarise(n=n()) %>% ggplot(aes(year,n)) + geom_area() + ylab("game count")
+boardgame %>% filter(year>1980) %>% group_by(year) %>% summarise(own=sum(owned)) %>% ggplot(aes(year,own)) + geom_area() + ylab("game owned")
+plot(temp$year,temp$own,type = "l",xlab="year",ylab="game owned")
 boardgame %>% ggplot(aes(num_votes,owned)) + geom_point(color=boardgame$age+1)
 
 boxplot(boardgame$age)
@@ -40,6 +42,10 @@ All_mechanic = unlist(strsplit(boardgame$mechanic, ", "))
 Uniq_mechanic = unique(All_mechanic)
 All_cat = unlist(strsplit(boardgame$category, ", "))
 Uniq_cat = unique(All_cat)
+
+# mechanic_df = as.data.frame(sapply(Uniq_mechanic, function(x) grepl(x, boardgame$mechanic)*1))
+# category_df = as.data.frame(sapply(Uniq_category, function(x) grepl(x, boardgame$category)*1))
+# boardgame_cluster = cbind(boardgame, mechanic_df, category_df)
 
 boardgame_cluster <- matrix(0,nrow = dim(boardgame)[1],ncol = length(Uniq_mechanic)+length(Uniq_cat))
 
@@ -63,6 +69,8 @@ which(colnames(boardgame_cluster)=="Memory") # 26 117
 colnames(boardgame_cluster)[26] <- "Memory_mechanic"
 colnames(boardgame_cluster)[117] <- "Memory_cat"
 colnames(boardgame_cluster)[1:20]
+# boardgame <- scale(boardgame)
+
 #boardgame_cluster <- unique(boardgame_cluster)
 #=========================================================================
 # Clustering (K-means)
